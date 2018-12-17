@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans.xsd
+ http://www.springframework.org/schema/aop
+ http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/context
+ http://www.springframework.org/schema/context/spring-context.xsd
+ http://www.springframework.org/schema/tx
+ http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+<!--service层的配置开始-->
+<!--组件扫描-->
+<context:component-scan base-package="com.itheima.service"/>
+        <!--配置事务管理器-->
+<bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+<property name="dataSource" ref="dataSource"/>
+</bean>
+
+        <!--配置事务通知-->
+<tx:advice id="advice" >
+<!--事务属性配置-->
+<tx:attributes>
+    <tx:method name="save*" propagation="REQUIRED"/>
+    <tx:method name="delete*" propagation="REQUIRED"/>
+    <tx:method name="update*" propagation="REQUIRED"/><!--增删改必须进行事务处理-->
+    <tx:method name="find*" propagation="SUPPORTS" read-only="true"/> <!--查找仅可读-->
+    <tx:method name="*" propagation="REQUIRED"/> <!--其余方法默认添加事务-->
+</tx:attributes>
+</tx:advice>
+        <!--配置切面-->
+<aop:config>
+<!--配置切点-->
+<aop:pointcut id="pt" expression="execution(* com.itheima.service.impl.*.*(..))"/>
+<!--配置通知与切点的联系-->
+<aop:advisor advice-ref="advice" pointcut-ref="pt"/>
+</aop:config>
+        <!--service层的配置结束-->
+    </beans>
